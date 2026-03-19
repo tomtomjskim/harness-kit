@@ -50,6 +50,7 @@ program
         outputDir: opts.outputDir,
         localDir: opts.localDir,
         globalDir: opts.globalDir,
+        profile: opts.profile,
       });
     } catch (err) {
       if (err instanceof HarnessError) {

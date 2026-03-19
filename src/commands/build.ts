@@ -15,6 +15,8 @@ export interface BuildOptions {
   localDir?: string;
   /** Override global modules directory (default: ~/.harness-kit/modules) */
   globalDir?: string;
+  /** Build profile name (merges profile modules with base modules) */
+  profile?: string;
 }
 
 /**
@@ -78,6 +80,33 @@ export async function buildFromFile(
     process.exit(1);
   }
 
+  const config = parseResult.data;
+
+  // Apply profile: merge profile modules into base modules
+  if (options.profile) {
+    const profileName = options.profile;
+    const profiles = config.profiles ?? {};
+    if (!(profileName in profiles)) {
+      const available = Object.keys(profiles);
+      console.error(`[harness-kit] Profile "${profileName}" not found.`);
+      if (available.length > 0) {
+        console.error(`  Available profiles: ${available.join(', ')}`);
+      } else {
+        console.error('  No profiles defined in harness.config.yaml.');
+        console.error('  Add a "profiles:" section to your config.');
+      }
+      process.exit(1);
+    }
+    const profile = profiles[profileName];
+    if (profile.modules && profile.modules.length > 0) {
+      // Append profile modules to base modules
+      config.modules = [...config.modules, ...profile.modules];
+      if (options.verbose) {
+        console.log(`[profile:${profileName}] Added ${profile.modules.length} modules: ${profile.modules.map(m => m.name).join(', ')}`);
+      }
+    }
+  }
+
   // Apply HARNESS_MODULE_ROOT env var as globalDir default
   const finalOptions: BuildOptions = {
     ...options,
@@ -85,5 +114,5 @@ export async function buildFromFile(
     localDir: options.localDir ?? resolve('.harness', 'modules'),
   };
 
-  await build(parseResult.data, finalOptions);
+  await build(config, finalOptions);
 }
