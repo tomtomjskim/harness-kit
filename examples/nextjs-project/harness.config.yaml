@@ -1,0 +1,60 @@
+version: "1"
+name: nextjs-saas
+
+modules:
+  # Instructions
+  - name: korean-conventions
+  - name: typescript-strict
+  - name: nextjs-15
+  - name: docker-project
+    vars:
+      service_name: web-app
+      container_ip: 172.20.0.10
+      mem_limit: 512m
+
+  # Hooks
+  - name: security-gate
+  - name: auto-format
+    vars:
+      formatter: prettier
+
+  # MCP
+  - name: serena
+  - name: shadcn
+
+  # Agents
+  - name: architect
+  - name: developer
+  - name: security-reviewer
+
+  # Workflows
+  - name: standard
+  - name: code-review
+
+settings:
+  language: korean
+  effortLevel: high
+  env:
+    CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS: "1"
+
+custom:
+  - id: api-format
+    section: "## API Response Format"
+    content: |
+      All API responses follow this format:
+      - Success: `{ data: T, meta: { page, total } }`
+      - Error: `{ error: { code: string, message: string } }`
+
+  - id: deployment
+    section: "## Deployment Rules"
+    content: |
+      - Always use PR flow (dev → main)
+      - Run migrations on dev DB first
+
+profiles:
+  dev:
+    modules:
+      - name: debug-verbose
+  prod:
+    modules:
+      - name: strict-permissions

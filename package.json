@@ -1,0 +1,46 @@
+{
+  "name": "harness-kit",
+  "version": "0.1.0",
+  "description": "Claude Code harness framework — modular hooks, MCP, agents, settings management",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "harness-kit": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "claude-code",
+    "harness",
+    "ai-agent",
+    "mcp",
+    "hooks",
+    "configuration"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "commander": "^14.0.3",
+    "glob": "^13.0.6",
+    "gray-matter": "^4.0.3",
+    "js-yaml": "^4.1.1",
+    "mustache": "^4.2.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/mustache": "^4.2.6",
+    "@types/node": "^25.5.0",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.0"
+  }
+}
