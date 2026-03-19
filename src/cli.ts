@@ -1,6 +1,19 @@
 #!/usr/bin/env node
 import { Command } from 'commander';
 import { buildFromFile } from './commands/build.js';
+import { createModuleCommand } from './commands/create-module.js';
+import { HarnessError } from './errors.js';
+
+process.on('unhandledRejection', (err) => {
+  if (err instanceof HarnessError) {
+    console.error(`[harness-kit] Error (${err.code}): ${err.message}`);
+  } else if (err instanceof Error) {
+    console.error(`[harness-kit] ${err.message}`);
+  } else {
+    console.error(`[harness-kit] Unexpected error: ${err}`);
+  }
+  process.exit(1);
+});
 
 const program = new Command();
 
@@ -30,13 +43,24 @@ program
     localDir?: string;
     globalDir?: string;
   }) => {
-    await buildFromFile(opts.config, {
-      verbose: opts.verbose,
-      dryRun: opts.dryRun,
-      outputDir: opts.outputDir,
-      localDir: opts.localDir,
-      globalDir: opts.globalDir,
-    });
+    try {
+      await buildFromFile(opts.config, {
+        verbose: opts.verbose,
+        dryRun: opts.dryRun,
+        outputDir: opts.outputDir,
+        localDir: opts.localDir,
+        globalDir: opts.globalDir,
+      });
+    } catch (err) {
+      if (err instanceof HarnessError) {
+        console.error(`[harness-kit] Error (${err.code}): ${err.message}`);
+      } else if (err instanceof Error) {
+        console.error(`[harness-kit] ${err.message}`);
+      } else {
+        console.error(`[harness-kit] Unexpected error: ${err}`);
+      }
+      process.exit(1);
+    }
   });
 
 // ─── init ────────────────────────────────────────────────────────────────────
@@ -100,6 +124,23 @@ program
     try {
       const { doctorCommand } = await import('./commands/doctor.js');
       await doctorCommand();
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      process.stderr.write(`Error: ${msg}\n`);
+      process.exit(1);
+    }
+  });
+
+// ─── create-module ───────────────────────────────────────────────────────────
+
+program
+  .command('create-module <name>')
+  .description('Create a new module from template')
+  .option('--type <type>', 'Module type (instruction, hook, mcp, agent, workflow, permission, skill)', 'instruction')
+  .option('--output-dir <dir>', 'Output directory', '.harness/modules')
+  .action(async (name: string, opts: { type?: string; outputDir?: string }) => {
+    try {
+      await createModuleCommand(name, opts);
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       process.stderr.write(`Error: ${msg}\n`);

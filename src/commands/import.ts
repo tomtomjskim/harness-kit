@@ -46,9 +46,8 @@ function parseSections(markdown: string): Section[] {
     const h2Match = !inCodeBlock ? line.match(/^##\s+(.+)/) : null;
     const h1Match = !inCodeBlock ? line.match(/^#\s+(.+)/) : null;
 
-    if (h2Match || h1Match) {
-      const level = h2Match ? 2 : 1;
-      const title = (h2Match ?? h1Match)![1].trim();
+    if (h2Match) {
+      const title = h2Match[1].trim();
 
       if (!foundFirstHeading && preambleLines.length > 0) {
         // Store preamble as a section if there's content
@@ -76,8 +75,11 @@ function parseSections(markdown: string): Section[] {
         title,
         slug: toKebabCase(title),
         content: '',
-        level,
+        level: 2,
       };
+    } else if (h1Match && !foundFirstHeading) {
+      // h1 is treated as document title — collect as preamble content
+      preambleLines.push(line);
     } else {
       if (!foundFirstHeading) {
         preambleLines.push(line);
