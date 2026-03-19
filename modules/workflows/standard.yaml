@@ -1,0 +1,72 @@
+---
+name: standard-workflow
+type: workflow
+description: 일반 기능 개발 7단계 워크플로우
+tags: [workflow, standard, development]
+priority: 50
+---
+
+phases:
+  analyze:
+    parallel: false
+    tasks:
+      - id: explore-codebase
+        agent: explorer
+        action: 코드베이스 탐색 및 영향 범위 파악
+        outputs: [analysis.md]
+
+  design:
+    depends_on: [analyze]
+    tasks:
+      - id: architecture-review
+        agent: architect
+        action: 설계 검토 및 구현 전략 수립
+        inputs: [analysis.md]
+        outputs: [design.md]
+
+  implement:
+    depends_on: [design]
+    parallel: true
+    tasks:
+      - id: backend-impl
+        agent: developer
+        action: 백엔드 구현
+        inputs: [design.md]
+      - id: frontend-impl
+        agent: developer
+        action: 프론트엔드 구현
+        inputs: [design.md]
+        condition: has_ui_changes
+
+  review:
+    depends_on: [implement]
+    parallel: true
+    tasks:
+      - id: security-review
+        agent: security-reviewer
+        action: 보안 리뷰
+      - id: architecture-review-2
+        agent: architect
+        action: 구현 결과 아키텍처 리뷰
+
+  test:
+    depends_on: [review]
+    tasks:
+      - id: qa-test
+        agent: qa-engineer
+        action: 테스트 작성 및 실행
+
+  deploy:
+    depends_on: [test]
+    tasks:
+      - id: deploy
+        agent: publisher
+        action: 빌드 및 배포
+        approval_required: true
+
+  document:
+    depends_on: [deploy]
+    tasks:
+      - id: update-docs
+        agent: documenter
+        action: 문서 업데이트

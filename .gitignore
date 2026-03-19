@@ -4,3 +4,7 @@ dist/
 .harness-tmp/
 .env
 .env.local
+CLAUDE.md
+.claude/
+.harness/
+harness.config.yaml

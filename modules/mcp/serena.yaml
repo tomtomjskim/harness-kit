@@ -1,0 +1,11 @@
+---
+name: serena-mcp
+type: mcp
+description: Serena 시맨틱 코드 분석 MCP 서버
+tags: [mcp, code-analysis, serena]
+priority: 50
+---
+
+command: npx
+args:
+  - serena-mcp@latest

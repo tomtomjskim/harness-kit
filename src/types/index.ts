@@ -80,7 +80,7 @@ export const WhenConditionSchema = z.object({
 
 // Config Module Entry
 export const ConfigModuleEntrySchema = z.object({
-  name: z.string().min(1),
+  name: z.string().min(1).regex(/^[a-z0-9-]+$/, 'Module name must be kebab-case (a-z, 0-9, hyphens only)'),
   type: ModuleTypeEnum.optional(),
   source: z.string().optional(),
   vars: z.record(z.string(), z.unknown()).optional(),

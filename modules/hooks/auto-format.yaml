@@ -1,0 +1,35 @@
+---
+name: auto-format
+type: hook
+description: 파일 수정 후 자동 포맷팅 (prettier/eslint)
+tags: [formatting, hook, postToolUse]
+priority: 50
+variables:
+  formatter:
+    type: string
+    required: false
+    default: prettier
+    description: 사용할 포맷터 (prettier, eslint, biome)
+---
+
+event: PostToolUse
+matcher: Write|Edit
+hooks:
+  - type: command
+    command: >-
+      bash -c '
+      INPUT=$(cat);
+      FILE=$(echo "$INPUT" | jq -r ".tool_input.file_path // empty");
+      if [ -z "$FILE" ] || [ ! -f "$FILE" ]; then exit 0; fi;
+      EXT="${FILE##*.}";
+      case "$EXT" in
+        ts|tsx|js|jsx|json|css|scss|html|md)
+          if command -v {{formatter}} &>/dev/null; then
+            {{formatter}} --write "$FILE" 2>/dev/null || true;
+          fi
+          ;;
+      esac;
+      exit 0;
+      '
+    timeout: 10000
+    async: true
