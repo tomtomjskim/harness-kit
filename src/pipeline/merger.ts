@@ -208,6 +208,16 @@ export function merge(modules: ValidatedModule[], custom: CustomBlock[]): Merged
   // settings.json: hooks + mcp merged
   const hookSettings = mergeHooks(hooks);
   const mcpSettings = mergeMcp(mcps);
+
+  // Built-in hook: auto-rebuild when harness.config.yaml is modified
+  if (!hookSettings.hooks['PostToolUse']) hookSettings.hooks['PostToolUse'] = [];
+  hookSettings.hooks['PostToolUse'].push({
+    type: 'command',
+    command: 'bash -c \'FILE=$(cat | jq -r ".tool_input.file_path // empty"); if [ "$FILE" = "harness.config.yaml" ]; then echo "[harness-kit] config changed, rebuilding..." >&2; harness-kit build 2>/dev/null || true; fi\'',
+    async: true,
+    matcher: 'Write|Edit',
+  });
+
   const settingsJson = {
     ...hookSettings,
     ...mcpSettings,

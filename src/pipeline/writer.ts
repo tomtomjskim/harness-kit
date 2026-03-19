@@ -80,6 +80,56 @@ function collectFiles(output: MergedOutput): FileEntry[] {
     }
   }
 
+  // ── Boilerplate: Claude Code integration files ──
+
+  // 1. Custom Command: /harness slash command
+  files.push({
+    relativePath: '.claude/commands/harness.md',
+    content: [
+      '---',
+      'description: harness-kit 모듈 관리 (build, list, import, doctor)',
+      '---',
+      '',
+      '$ARGUMENTS 를 분석하여 적절한 harness-kit CLI 명령을 실행하세요.',
+      '',
+      '사용 가능한 명령:',
+      '- `harness-kit build [--verbose] [--dry-run]` — 모듈에서 Claude Code 설정 빌드',
+      '- `harness-kit list [--search <query>]` — 사용 가능 모듈 목록',
+      '- `harness-kit import <file>` — 기존 CLAUDE.md를 모듈로 분해',
+      '- `harness-kit doctor` — 환경 진단',
+      '',
+      '환경변수 HARNESS_MODULE_ROOT가 설정되어 있는지 먼저 확인하세요.',
+      '설정되지 않았으면 `export HARNESS_MODULE_ROOT=~/.harness-kit/modules` 를 안내하세요.',
+      '',
+      '인자가 없으면 사용 가능한 명령 목록을 보여주세요.',
+      '',
+    ].join('\n'),
+  });
+
+  // 2. Skill: auto-detection for harness-kit managed projects
+  files.push({
+    relativePath: '.claude/skills/harness-kit/SKILL.md',
+    content: [
+      '---',
+      'name: harness-kit-managed',
+      'description: harness.config.yaml이 있는 프로젝트에서 CLAUDE.md 직접 수정 방지 및 harness-kit 빌드 안내',
+      '---',
+      '',
+      '이 프로젝트는 **harness-kit**으로 Claude Code 설정을 관리합니다.',
+      '',
+      '## 규칙',
+      '- CLAUDE.md를 직접 수정하지 마세요 (자동 생성 파일)',
+      '- 설정 변경은 `harness.config.yaml`을 편집한 후 `harness-kit build`를 실행하세요',
+      '- `.claude/settings.json`, `.claude/agents/`, `.claude/commands/harness.md`도 자동 생성됩니다',
+      '',
+      '## 빠른 명령',
+      '- `/harness build` — 설정 빌드',
+      '- `/harness list` — 모듈 목록',
+      '- `/harness doctor` — 환경 진단',
+      '',
+    ].join('\n'),
+  });
+
   return files;
 }
 
