@@ -148,6 +148,24 @@ program
     }
   });
 
+// ─── install-modules ─────────────────────────────────────────────────────────
+
+program
+  .command('install-modules')
+  .description('Install built-in modules to global directory (~/.harness-kit/modules/)')
+  .option('--link', 'Create symlinks instead of copying')
+  .option('--force', 'Overwrite existing files')
+  .action(async (opts: { link?: boolean; force?: boolean }) => {
+    try {
+      const { installModulesCommand } = await import('./commands/install-modules.js');
+      await installModulesCommand(opts);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      process.stderr.write(`Error: ${msg}\n`);
+      process.exit(1);
+    }
+  });
+
 // ─── parse ───────────────────────────────────────────────────────────────────
 
 program.parse();

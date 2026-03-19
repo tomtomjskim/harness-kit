@@ -1,0 +1,22 @@
+---
+name: git-safe
+type: permission
+description: Git 명령어의 안전한 권한 설정 (위험 명령 차단)
+tags: [permission, git, safety]
+priority: 30
+---
+
+allow:
+  - "Bash(git status*)"
+  - "Bash(git diff*)"
+  - "Bash(git log*)"
+  - "Bash(git add*)"
+  - "Bash(git commit*)"
+  - "Bash(git branch*)"
+  - "Bash(git checkout*)"
+  - "Bash(git pull*)"
+  - "Bash(git push*)"
+deny:
+  - "Bash(git push --force*)"
+  - "Bash(git reset --hard*)"
+  - "Bash(git clean -f*)"

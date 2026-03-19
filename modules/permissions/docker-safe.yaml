@@ -1,0 +1,17 @@
+---
+name: docker-safe
+type: permission
+description: Docker 관련 명령어의 안전한 권한 설정
+tags: [permission, docker, safety]
+priority: 30
+---
+
+allow:
+  - "Bash(docker compose*)"
+  - "Bash(docker logs*)"
+  - "Bash(docker ps*)"
+  - "Bash(docker exec*)"
+deny:
+  - "Bash(docker rm -f*)"
+  - "Bash(docker system prune*)"
+  - "Bash(docker volume rm*)"

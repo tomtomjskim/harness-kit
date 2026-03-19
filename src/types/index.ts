@@ -25,6 +25,7 @@ export const BaseModuleSchema = z.object({
   dependencies: z.array(z.string()).default([]),
   variables: z.record(z.string(), VariableDefSchema).optional(),
   source: z.string().optional(), // reserved for v1
+  section: z.string().optional(), // CLAUDE.md section heading for this module
 });
 export type BaseModule = z.infer<typeof BaseModuleSchema>;
 

@@ -1,0 +1,24 @@
+---
+name: notify
+type: hook
+description: Claude Code 작업 완료 또는 입력 대기 시 OS 알림
+tags: [notification, hook, productivity]
+priority: 90
+---
+
+event: Notification
+hooks:
+  - type: command
+    command: >-
+      bash -c '
+      INPUT=$(cat);
+      TITLE=$(echo "$INPUT" | jq -r ".title // \"Claude Code\"");
+      MSG=$(echo "$INPUT" | jq -r ".message // \"Task completed\"");
+      if command -v notify-send &>/dev/null; then
+        notify-send "$TITLE" "$MSG" 2>/dev/null || true;
+      elif command -v osascript &>/dev/null; then
+        osascript -e "display notification \"$MSG\" with title \"$TITLE\"" 2>/dev/null || true;
+      fi;
+      exit 0;
+      '
+    async: true
