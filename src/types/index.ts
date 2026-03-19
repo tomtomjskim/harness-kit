@@ -69,6 +69,7 @@ export const CustomBlockSchema = z.object({
   id: z.string().min(1),
   section: z.string().optional(),
   content: z.string(),
+  position: z.enum(['prepend', 'append']).default('append'),
 });
 
 // Module When Condition

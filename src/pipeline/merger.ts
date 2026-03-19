@@ -171,14 +171,23 @@ function mergePermissions(modules: ValidatedModule[]): PermissionSettings {
 function appendCustomBlocks(base: string, custom: CustomBlock[]): string {
   if (custom.length === 0) return base;
 
-  const parts = [base];
+  const prepend: string[] = [];
+  const append: string[] = [];
+
   for (const block of custom) {
-    if (block.section) {
-      parts.push(block.section);
-    }
+    const parts: string[] = [];
+    if (block.section) parts.push(block.section);
     parts.push(block.content);
+    const combined = parts.join('\n\n');
+
+    if ((block as { position?: string }).position === 'prepend') {
+      prepend.push(combined);
+    } else {
+      append.push(combined);
+    }
   }
-  return parts.join('\n\n').trim();
+
+  return [...prepend, base, ...append].join('\n\n').trim();
 }
 
 // ---- Main merge ----

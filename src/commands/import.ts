@@ -35,10 +35,16 @@ function parseSections(markdown: string): Section[] {
   // Preamble before any heading
   let preambleLines: string[] = [];
   let foundFirstHeading = false;
+  let inCodeBlock = false;
 
   for (const line of lines) {
-    const h2Match = line.match(/^##\s+(.+)/);
-    const h1Match = line.match(/^#\s+(.+)/);
+    // Track code block boundaries to avoid splitting inside them
+    if (line.trimStart().startsWith('```')) {
+      inCodeBlock = !inCodeBlock;
+    }
+
+    const h2Match = !inCodeBlock ? line.match(/^##\s+(.+)/) : null;
+    const h1Match = !inCodeBlock ? line.match(/^#\s+(.+)/) : null;
 
     if (h2Match || h1Match) {
       const level = h2Match ? 2 : 1;
@@ -95,13 +101,19 @@ function parseSections(markdown: string): Section[] {
 
 function generateModuleFrontmatter(section: Section): string {
   const name = section.slug || 'section';
-  const description = section.title;
+  // Escape description for YAML safety (backticks, colons, quotes)
+  const rawDesc = section.title;
+  const needsQuoting = /[`:#"'{}[\]|>&*!%@]/.test(rawDesc);
+  const description = needsQuoting ? `"${rawDesc.replace(/"/g, '\\"')}"` : rawDesc;
+  // Auto-generate section heading from title
+  const sectionHeading = section.level <= 2 ? `## ${section.title}` : `### ${section.title}`;
   return [
     '---',
     `name: ${name}`,
     `type: instruction`,
     `description: ${description}`,
     `tags: [imported]`,
+    `section: "${sectionHeading}"`,
     `priority: 50`,
     '---',
   ].join('\n');
