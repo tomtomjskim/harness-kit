@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   apply-lockfile:
-    if: github.event.head_commit.message != 'chore: apply npm audit lockfile remediation'
+    if: "${{ github.event.head_commit.message != 'chore: apply npm audit lockfile remediation' }}"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
